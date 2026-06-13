@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { questionsData, languages, difficulties } from '../data/questionsData';
 
@@ -13,7 +13,16 @@ const Quiz = () => {
   const [quizFinished, setQuizFinished] = useState(false);
 
   const langQuestions = questionsData[language];
-  const testQuestions = langQuestions ? langQuestions[difficulty] : null;
+  
+  // Test savollarini olish va har bir savolning variantlarini tasodifiy aralashtirish
+  const testQuestions = useMemo(() => {
+    const questions = langQuestions ? langQuestions[difficulty] : null;
+    if (!questions) return null;
+    return questions.map(q => {
+      const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+      return { ...q, options: shuffledOptions };
+    });
+  }, [langQuestions, difficulty]);
 
   if (!testQuestions || testQuestions.length === 0) {
     return (
